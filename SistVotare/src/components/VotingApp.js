@@ -16,6 +16,25 @@ const VotingApp = () => {
   const [txStatus, setTxStatus] = useState("");
   const [userAddress, setUserAddress] = useState("");
 
+  const [countdown, setCountdown] = useState('');
+
+  // Data alegerilor din Romania 
+  const electionDate = new Date('2025-05-04T00:00:00'); // Alegeri pe 4 mai 2025
+
+  // Functia care calculează numarul de zile pana la alegeri
+  const calculateCountdown = () => {
+    const today = new Date();
+    const timeDiff = electionDate.getTime() - today.getTime(); 
+    const daysRemaining = Math.floor(timeDiff / (1000 * 3600 * 24)); 
+    setCountdown(daysRemaining > 0 ? daysRemaining : 0); 
+  };
+
+  useEffect(() => {
+    calculateCountdown();
+    const intervalId = setInterval(calculateCountdown, 86400000); 
+    return () => clearInterval(intervalId); 
+  }, []);
+  
   // Initializeaza semnatura utilizatorului si seteaza adresa acestuia
   const initSigner = async () => {
     const provider = new ethers.JsonRpcProvider("http://localhost:8545");
@@ -168,6 +187,14 @@ const VotingApp = () => {
   return (
     <div className="container">
       <h1>Voting System</h1>
+
+       {/* Numaratoare inversa */}
+      <div className="countdown">
+        {countdown > 0
+           ? `Time remaining until elections: ${countdown} days`
+           : 'The elections have already taken place or the date has passed!'}
+      </div>
+
       <div><strong>Address:</strong> {userAddress}</div> {/* Afiseaza adresa utilizatorului */}
       <input
         type="text"
